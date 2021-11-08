@@ -1,26 +1,47 @@
-import { useState } from 'react'
+import { useRef, useCallback, useMemo, useState } from 'react'
+import { InputLogin } from './components/InputLogin'
+import { ButtonLogin } from './components/ButtonLogin'
+import { useUsuarioLogado } from '../../shared/hooks'
 
 export const Login = () => {
+    const { nomeDoUsuario } = useUsuarioLogado()
+    
+    const inputPasswordRef = useRef<HTMLInputElement>(null)
+
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
-    const handleLogin = () => console.log(email, password)
+    const emailLength = useMemo(() => email.length * 1000, [email.length])
 
+    const handleLogin = useCallback(() => {
+        inputPasswordRef.current?.focus()
+        console.log(email, password)
+    }, [email, password])
+ 
     return (
         <form>
-            <div>
-                <label htmlFor="">
-                    <samp>Email</samp>
-                    <input type="text" value={email} onChange={ev => setEmail(ev.target.value)} />
-                </label>
-            </div>
-            <div>
-                <label htmlFor="">
-                    <samp>Senha</samp>
-                    <input type="text" value={password} onChange={ev => setPassword(ev.target.value)} />
-                </label>
-            </div>
-            <button type="button" onClick={handleLogin}>Entrar</button>
+            <p>Quantidade de caracteres no email: {emailLength}</p>
+
+            <p>{nomeDoUsuario}</p>
+
+            <InputLogin 
+                label="Email"
+                value={email}
+                onChange={setEmail}
+                onPressEnter={() => inputPasswordRef.current?.focus()}
+            />
+
+            <InputLogin 
+                label="Senha"
+                type="password"
+                value={password}
+                ref={inputPasswordRef}
+                onChange={setPassword}
+            />
+            
+            <ButtonLogin type="button" onClick={handleLogin}>
+                Login
+            </ButtonLogin>
         </form>
     )
 }
